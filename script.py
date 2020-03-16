@@ -7,6 +7,8 @@ import urllib
 import logging
 import requests
 import yaml
+import sys
+import lxml
 
 # setup logger
 logger = logging.getLogger()
@@ -49,7 +51,7 @@ def login_search():
     )
     for event in [
         e for e in reversed(new_events)
-        if not re.search("(日前|年前)", e.find("span").text)
+        if not re.search("(時間前|日前|年前)", e.find("span").text)
             and e.attrs["class"] != "past"
             and not re.search("重複", e.find_all("a")[1].text)
     ]:
@@ -64,7 +66,7 @@ def login_search():
 
     if len(event_dict.keys()) == 0:
         logger.info("no events")
-        return
+        sys.exit(0)
     return event_dict
 
 def slack_cast(event_dict):
@@ -82,8 +84,8 @@ def slack_cast(event_dict):
     }
     logger.info(slack_payload)
 
-#    binary_data = json.dumps(slack_payload).encode("utf8")
-#    urllib.request.urlopen(slack_webhook_url, binary_data)
+    binary_data = json.dumps(slack_payload).encode("utf8")
+    urllib.request.urlopen(slack_webhook_url, binary_data)
 
 def lambda_handler(event, context):
     event_dict = login_search()

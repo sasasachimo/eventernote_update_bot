@@ -1,1 +1,6 @@
 config.yml
+*/*
+.DS_Store
+
+six.py
+*.zip
